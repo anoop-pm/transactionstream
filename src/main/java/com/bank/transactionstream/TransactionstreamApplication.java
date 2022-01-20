@@ -38,7 +38,7 @@ public class TransactionstreamApplication {
 		 Properties config = new Properties();
 
 	        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "bank-Transaction");
-	        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+	        config.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "bankkafka:9092");
 	        config.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
 	        // we disable the cache to demonstrate all the "steps" involved in the transformation - not recommended in prod
@@ -54,7 +54,7 @@ public class TransactionstreamApplication {
 	        
 	        StreamsBuilder builder = new StreamsBuilder();
 
-	        KStream<String, JsonNode> bankTransactions = builder.stream("kafka-testing1",
+	        KStream<String, JsonNode> bankTransactions = builder.stream("bankone",
 	                Consumed.with(Serdes.String(), jsonSerde));
 
 
@@ -75,7 +75,7 @@ public class TransactionstreamApplication {
 	                                .withValueSerde(jsonSerde)
 	                );
 
-	        bankBalance.toStream().to("kafka-testing2", Produced.with(Serdes.String(), jsonSerde));
+	        bankBalance.toStream().to("banktwo", Produced.with(Serdes.String(), jsonSerde));
 
 	        KafkaStreams streams = new KafkaStreams(builder.build(), config);
 	        streams.cleanUp();
