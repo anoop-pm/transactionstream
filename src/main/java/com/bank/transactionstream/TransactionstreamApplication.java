@@ -34,7 +34,8 @@ public class TransactionstreamApplication {
 		SpringApplication.run(TransactionstreamApplication.class, args);
 		
 		
-		
+		/**KStream Read the bankinput topic to get message transaction details from bankapi and send to another topic transactionstreaminput
+		 * {"SenderAccountnumber":"256421","ReceiverAccountnumber":"2000","amount":"600","time":"2022-01-21T11:44:51.204Z"}  */
 		 Properties config = new Properties();
 
 	        config.put(StreamsConfig.APPLICATION_ID_CONFIG, "bank-Transaction");
@@ -54,7 +55,7 @@ public class TransactionstreamApplication {
 	        
 	        StreamsBuilder builder = new StreamsBuilder();
 
-	        KStream<String, JsonNode> bankTransactions = builder.stream("bankone",
+	        KStream<String, JsonNode> bankTransactions = builder.stream("bankinput",
 	                Consumed.with(Serdes.String(), jsonSerde));
 
 
@@ -75,7 +76,7 @@ public class TransactionstreamApplication {
 	                                .withValueSerde(jsonSerde)
 	                );
 
-	        bankBalance.toStream().to("banktwo", Produced.with(Serdes.String(), jsonSerde));
+	        bankBalance.toStream().to("transactionstreaminput", Produced.with(Serdes.String(), jsonSerde));
 
 	        KafkaStreams streams = new KafkaStreams(builder.build(), config);
 	        streams.cleanUp();
